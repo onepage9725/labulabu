@@ -170,7 +170,7 @@ a {
 .main-content {
     display: flex;
     gap: 40px;
-    padding-bottom: 100px;
+    padding-bottom: 150px; /* Increased gap before footer */
 }
 
 /* Sidebar */
@@ -448,7 +448,8 @@ a {
         padding-top: 40px;
     }
     .hero-title {
-        font-size: 20vw; /* Make it pop nicely on mobile */
+        font-size: 15vw; /* Scale down so it falls onto two lines naturally */
+        line-height: 1.1;
         text-align: center;
         margin-bottom: 20px;
     }
