@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  PageBlurReveal,
   FadeDownNav, 
   StaggeredHeroTitle, 
   FadeUpHeroContent, 
@@ -37,7 +36,7 @@ export default function App() {
     : products.filter(product => product.category === activeCategory);
 
   return (
-    <PageBlurReveal>
+    <>
       <div className="top-banner" style={{ zIndex: 100, position: 'sticky', top: 0 }}>
         <span style={{ color: 'var(--secondary-color)' }}>ORDER FRESH BAKE HERE</span>
       </div>
@@ -152,6 +151,6 @@ export default function App() {
         <p>© 2026 Labu+labu Cafe</p>
         <p>Built with ❤️</p>
       </div>
-    </PageBlurReveal>
+    </>
   );
 }

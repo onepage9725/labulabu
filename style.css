@@ -154,11 +154,10 @@ a {
 }
 
 .hero-title {
-    font-size: 9vw;
+    font-size: 10vw;
     line-height: 0.9;
     margin: 0;
     letter-spacing: -2px;
-    white-space: nowrap;
 }
 
 .hero-subtitle {
