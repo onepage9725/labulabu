@@ -1,6 +1,6 @@
 :root {
     --primary-color: #683410;
-    --background-color: #CEC3B0;
+    --background-color: #FDFDF1;
     --font-heading: 'Amaranth', sans-serif;
     --font-body: 'Noto Sans', sans-serif;
     --border-color: rgba(104, 52, 16, 0.2);
@@ -217,7 +217,7 @@ a {
 }
 
 .card-image-wrapper {
-    background-color: #CEC3B0;
+    background-color: transparent; /* Rely solely on the PNG's natural background color */
     padding: 20px;
     border-radius: 8px;
     position: relative;
