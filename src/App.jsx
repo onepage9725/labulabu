@@ -89,7 +89,7 @@ export default function App() {
             <FadeUpGridCard key={product.id} index={index}>
               <div className="card-image-wrapper">
                 {product.img ? (
-                  <img src={product.img} alt={product.title} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  <img src={product.img} alt={product.title} style={{ width: '100%', height: 'auto', display: 'block', mixBlendMode: 'multiply' }} />
                 ) : (
                   <div className="image-placeholder"></div>
                 )}
