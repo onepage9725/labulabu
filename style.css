@@ -1,6 +1,6 @@
 :root {
     --primary-color: #683410;
-    --background-color: #999481;
+    --background-color: #FDFDF1;
     --font-heading: 'Amaranth', sans-serif;
     --font-body: 'Noto Sans', sans-serif;
     --border-color: rgba(104, 52, 16, 0.2);
@@ -106,7 +106,7 @@ a {
 }
 
 .nav-center .logo {
-    height: 60px; /* Slightly larger logo in header */
+    height: 30px; /* Reduced by half */
     object-fit: contain;
 }
 
@@ -217,7 +217,7 @@ a {
 }
 
 .card-image-wrapper {
-    background-color: var(--placeholder-bg);
+    background-color: #CEC3B0;
     padding: 20px;
     border-radius: 8px;
     position: relative;

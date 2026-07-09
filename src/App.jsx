@@ -51,7 +51,7 @@ export default function App() {
             <img src="/labulogo.png" alt="Labu+labu" className="logo" onError={(e) => e.target.outerHTML='<h2 class="logo-text">Labu+labu</h2>'} />
           </div>
           <div className="nav-right">
-            <a href="#cart" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>CART ↗</a>
+            {/* Cart link removed temporarily */}
           </div>
         </header>
       </FadeDownNav>
@@ -95,7 +95,7 @@ export default function App() {
                 )}
               </div>
               <div className="card-content">
-                <p className="category">{product.category}</p>
+                {/* Category removed as requested */}
                 <h3 className="product-title">{product.title}</h3>
                 <p className="description" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   ESPRESSO, OAT MILK, CARAMEL DRIZZLE
