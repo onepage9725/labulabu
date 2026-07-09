@@ -1,6 +1,7 @@
 :root {
     --primary-color: #683410;
     --background-color: #FDFDF1;
+    --product-surface-color: #CEC3B0;
     --font-heading: 'Amaranth', sans-serif;
     --font-body: 'Noto Sans', sans-serif;
     --border-color: rgba(104, 52, 16, 0.2);
@@ -217,9 +218,9 @@ a {
 }
 
 .card-image-wrapper {
-    background-color: transparent; /* Rely solely on the PNG's natural background color */
-    padding: 20px;
-    border-radius: 8px;
+    background-color: var(--product-surface-color);
+    padding: 0;
+    border-radius: 6px;
     position: relative;
     aspect-ratio: 1 / 1; /* Match the square-ish look from your screenshots */
     display: flex;
@@ -242,7 +243,7 @@ a {
 .image-placeholder {
     width: 100%;
     height: 100%;
-    background-color: rgba(104, 52, 16, 0.05); /* Placeholder until images are loaded */
+    background-color: var(--product-surface-color);
     border-radius: 4px;
 }
 
