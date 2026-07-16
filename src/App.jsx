@@ -546,7 +546,6 @@ export default function App() {
                   <div className="product-card-actions">
                     {requiresPackSelection(product) && (
                       <div className="pack-selector" onClick={(event) => event.stopPropagation()}>
-                        <p className="pack-helper">Please choose size: 4pcs or 8pcs</p>
                         <div className="pack-buttons">
                           <button
                             type="button"
@@ -722,7 +721,11 @@ export default function App() {
                           <div className="checkout-product-text">
                             <p className="checkout-product-title">{item.title}</p>
                             {item.packSize && <p className="checkout-product-meta">{item.packSize}</p>}
-                            <p className="checkout-product-meta">Qty: {item.quantity}</p>
+                            <div className="summary-qty-controller">
+                              <button type="button" onClick={() => updateCartQuantity(item.key, -1)} aria-label="Decrease quantity">-</button>
+                              <span>{item.quantity}</span>
+                              <button type="button" onClick={() => updateCartQuantity(item.key, 1)} aria-label="Increase quantity">+</button>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -799,7 +802,11 @@ export default function App() {
                             <div className="checkout-product-text">
                               <p className="checkout-product-title">{item.title}</p>
                               {item.packSize && <p className="checkout-product-meta">{item.packSize}</p>}
-                              <p className="checkout-product-meta">Qty: {item.quantity}</p>
+                              <div className="summary-qty-controller">
+                                <button type="button" onClick={() => updateCartQuantity(item.key, -1)} aria-label="Decrease quantity">-</button>
+                                <span>{item.quantity}</span>
+                                <button type="button" onClick={() => updateCartQuantity(item.key, 1)} aria-label="Increase quantity">+</button>
+                              </div>
                             </div>
                           </div>
                         ))}
