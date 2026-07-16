@@ -3,6 +3,7 @@
     --secondary-color: #CEC3B0;
     --background-color: #FDFDF1;
     --banner-height: 31px;
+    --nav-height: 83px;
     --font-heading: 'Amaranth', sans-serif;
     --font-body: 'Noto Sans', sans-serif;
     --border-color: rgba(104, 52, 16, 0.2);
@@ -86,11 +87,18 @@ a {
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
-    position: sticky;
+    position: fixed;
     top: var(--banner-height);
+    left: 0;
+    right: 0;
     background-color: var(--background-color);
+    background: #fdfdf1;
     z-index: 150;
     border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-spacer {
+    height: var(--nav-height);
 }
 
 .nav-left {
@@ -1229,18 +1237,22 @@ a {
 }
 
 @media (max-width: 768px) {
+    :root {
+        --nav-height: 88px;
+    }
     .container {
         padding: 0 20px;
     }
     .navbar {
         padding: 14px 16px;
         border-radius: 20px;
-        margin: 10px 12px 0;
+        left: 12px;
+        right: 12px;
         border: 1px solid rgba(104, 52, 16, 0.12);
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
         justify-content: center;
         min-height: 88px;
-        top: var(--banner-height);
+        top: calc(var(--banner-height) + 8px);
     }
     .nav-left-desktop,
     .nav-right-desktop {
@@ -1315,11 +1327,16 @@ a {
 }
 
 @media (max-width: 480px) {
+    :root {
+        --nav-height: 76px;
+    }
     .navbar {
         min-height: 76px;
         border-radius: 16px;
         padding: 10px 12px;
-        margin: 8px 8px 0;
+        left: 8px;
+        right: 8px;
+        top: calc(var(--banner-height) + 6px);
     }
     .nav-center .logo {
         height: 28px;

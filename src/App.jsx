@@ -378,6 +378,7 @@ export default function App() {
           </div>
         </header>
       </FadeDownNav>
+      <div className="navbar-spacer" aria-hidden="true"></div>
 
       {showOrderSetup && (
         <div className="order-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="order-setup-title">
