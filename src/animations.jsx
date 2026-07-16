@@ -4,8 +4,8 @@ const luxuryEasing = [0.16, 1, 0.3, 1];
 
 export const FadeDownNav = ({ children }) => (
   <motion.div
-    initial={{ y: '-100%', opacity: 0, filter: 'blur(10px)' }}
-    animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+    initial={{ opacity: 0, filter: 'blur(10px)' }}
+    animate={{ opacity: 1, filter: 'blur(0px)' }}
     transition={{ duration: 1.2, ease: luxuryEasing }}
   >
     {children}

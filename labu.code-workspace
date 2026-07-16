@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Downloads/backery"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "labu"
+	}
+}
