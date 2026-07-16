@@ -21,7 +21,6 @@ body {
     font-family: var(--font-body);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    padding-top: calc(var(--banner-height) + 80px);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -70,10 +69,8 @@ a {
     justify-content: center;
     align-items: center;
     gap: 10px;
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
     z-index: 151; /* Above navbar */
 }
 
@@ -89,10 +86,8 @@ a {
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
-    position: fixed;
+    position: sticky;
     top: var(--banner-height);
-    left: 0;
-    right: 0;
     background-color: var(--background-color);
     z-index: 150;
     border-bottom: 1px solid var(--border-color);
@@ -1234,9 +1229,6 @@ a {
 }
 
 @media (max-width: 768px) {
-    body {
-        padding-top: calc(var(--banner-height) + 108px);
-    }
     .container {
         padding: 0 20px;
     }
@@ -1323,9 +1315,6 @@ a {
 }
 
 @media (max-width: 480px) {
-    body {
-        padding-top: calc(var(--banner-height) + 92px);
-    }
     .navbar {
         min-height: 76px;
         border-radius: 16px;
