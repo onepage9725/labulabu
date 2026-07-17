@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { 
-  FadeDownNav, 
-  StaggeredHeroTitle, 
-  FadeUpHeroContent, 
   FadeUpGridCard 
 } from './animations';
 
@@ -37,6 +34,9 @@ export default function App() {
   const [customerErrors, setCustomerErrors] = useState({});
   const [recentlyAddedKey, setRecentlyAddedKey] = useState('');
   const [cartPulse, setCartPulse] = useState(false);
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+  const [expandedBannerIndex, setExpandedBannerIndex] = useState(null);
+  const [touchStartX, setTouchStartX] = useState(null);
   const addFeedbackTimeoutRef = useRef(null);
   const cartPulseTimeoutRef = useRef(null);
 
@@ -90,6 +90,12 @@ export default function App() {
     { id: 17, category: 'BOSTON PIE CAKES', title: 'BOSTON PIE CAKE (TIRAMISU)', img: '/backery/Slice Tiramisu Boston Pie Cake.png' }
   ];
 
+  const bannerSlides = [
+    { id: 'banner-1', title: 'Freshly Baked Daily', img: '/backery/Chicken Flossie Balls.png' },
+    { id: 'banner-2', title: 'Handcrafted Cakes', img: '/backery/Black Forest Cake.png' },
+    { id: 'banner-3', title: 'Seasonal Signatures', img: '/backery/Slice Yam Burnt Cheesecake.png' }
+  ];
+
   const filteredProducts = activeCategory === 'ALL' 
     ? products 
     : products.filter(product => product.category === activeCategory);
@@ -115,6 +121,15 @@ export default function App() {
     [cartItems]
   );
 
+  const effectiveOrderType = dummyOrderSelection?.orderType || orderType;
+  const isOrderSetupComplete = Boolean(
+    dummyOrderSelection?.orderType &&
+    dummyOrderSelection?.outlet &&
+    dummyOrderSelection?.date
+  );
+  const deliveryFee = effectiveOrderType === 'Delivery' ? 20 : 0;
+  const cartGrandTotal = cartSubtotal + deliveryFee;
+
   const saveDummyOrderSelection = () => {
     if (!orderType || !selectedOutlet || !selectedDate) {
       return;
@@ -136,6 +151,11 @@ export default function App() {
     setSelectedOutlet('');
     setSelectedDate('');
     setOrderSetupStep(2);
+  };
+
+  const handleOrderTypeToggle = (type) => {
+    setOrderType(type);
+    setDummyOrderSelection((current) => (current ? { ...current, orderType: type } : current));
   };
 
   const goToDateStep = () => {
@@ -227,6 +247,14 @@ export default function App() {
     }
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setActiveBannerIndex((current) => (current + 1) % bannerSlides.length);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [bannerSlides.length]);
+
   const updateCartQuantity = (cartKey, delta) => {
     setCartItems((current) => current.map((item) => {
       if (item.key !== cartKey) {
@@ -245,6 +273,9 @@ export default function App() {
   };
 
   const openCart = () => {
+    if (!isOrderSetupComplete) {
+      return;
+    }
     setIsCartOpen(true);
     setCartStep('cart');
   };
@@ -308,33 +339,53 @@ export default function App() {
     }
   };
 
+  const goToNextBanner = () => {
+    setActiveBannerIndex((current) => (current + 1) % bannerSlides.length);
+  };
+
+  const goToPreviousBanner = () => {
+    setActiveBannerIndex((current) => (current - 1 + bannerSlides.length) % bannerSlides.length);
+  };
+
+  const handleCarouselTouchStart = (event) => {
+    setTouchStartX(event.touches[0].clientX);
+  };
+
+  const handleCarouselTouchEnd = (event) => {
+    if (touchStartX === null) {
+      return;
+    }
+
+    const endX = event.changedTouches[0].clientX;
+    const delta = endX - touchStartX;
+
+    if (Math.abs(delta) > 40) {
+      if (delta < 0) {
+        goToNextBanner();
+      } else {
+        goToPreviousBanner();
+      }
+    }
+
+    setTouchStartX(null);
+  };
+
   return (
     <>
       <div className="top-banner">
         <span style={{ color: 'var(--secondary-color)' }}>ORDER FRESH BAKE HERE</span>
       </div>
 
-      <FadeDownNav>
-        <header className="navbar">
+      <header className="navbar">
           <div className="nav-left nav-left-desktop">
-            <button className="nav-icon-button" type="button" aria-label="Smiling face button">
+            <button className="nav-icon-button" type="button" aria-label="Smiling face button" disabled={!isOrderSetupComplete}>
               <img src="/smiling face.png" alt="Smiling face" className="nav-icon" />
             </button>
           </div>
 
           <div className="nav-mobile-left" aria-hidden="true">
-            <button className="mobile-nav-icon-button" type="button" aria-label="Open menu">
-              <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-            <button className="mobile-nav-icon-button" type="button" aria-label="Search">
-              <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="7"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+            <button className="mobile-nav-icon-button mobile-smile-button" type="button" aria-label="Smiling face" disabled={!isOrderSetupComplete}>
+              <img src="/smiling face.png" alt="Smiling face" className="mobile-smile-icon" />
             </button>
           </div>
 
@@ -344,13 +395,25 @@ export default function App() {
           </div>
 
           <div className="nav-mobile-right" aria-hidden="true">
-            <button className="mobile-nav-icon-button" type="button" aria-label="Account">
-              <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21a8 8 0 0 0-16 0"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </button>
-            <button className={`mobile-nav-icon-button mobile-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Cart" onClick={openCart}>
+            <div className="mobile-order-toggle" role="group" aria-label="Choose order type">
+              <button
+                type="button"
+                className={effectiveOrderType === 'Self Collect' ? 'mobile-order-toggle-btn active' : 'mobile-order-toggle-btn'}
+                onClick={() => handleOrderTypeToggle('Self Collect')}
+                disabled={!isOrderSetupComplete}
+              >
+                SC
+              </button>
+              <button
+                type="button"
+                className={effectiveOrderType === 'Delivery' ? 'mobile-order-toggle-btn active' : 'mobile-order-toggle-btn'}
+                onClick={() => handleOrderTypeToggle('Delivery')}
+                disabled={!isOrderSetupComplete}
+              >
+                D
+              </button>
+            </div>
+            <button className={`mobile-nav-icon-button mobile-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Cart" onClick={openCart} disabled={!isOrderSetupComplete}>
               <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 8h15l-1.5 9h-11z"></path>
                 <path d="M6 8L4 4H2"></path>
@@ -360,14 +423,32 @@ export default function App() {
           </div>
 
           <div className="nav-right nav-right-desktop">
-            <button className={`nav-icon-button nav-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart}>
+            <div className="nav-order-toggle" role="group" aria-label="Choose order type">
+              <button
+                type="button"
+                className={effectiveOrderType === 'Self Collect' ? 'nav-order-toggle-btn active' : 'nav-order-toggle-btn'}
+                onClick={() => handleOrderTypeToggle('Self Collect')}
+                disabled={!isOrderSetupComplete}
+              >
+                Self Collect
+              </button>
+              <button
+                type="button"
+                className={effectiveOrderType === 'Delivery' ? 'nav-order-toggle-btn active' : 'nav-order-toggle-btn'}
+                onClick={() => handleOrderTypeToggle('Delivery')}
+                disabled={!isOrderSetupComplete}
+              >
+                Delivery
+              </button>
+            </div>
+            <button className={`nav-icon-button nav-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart} disabled={!isOrderSetupComplete}>
               <svg viewBox="0 0 24 24" className="nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 8h15l-1.5 9h-11z"></path>
                 <path d="M6 8L4 4H2"></path>
               </svg>
               <span className="desktop-cart-badge">{totalCartQuantity}</span>
             </button>
-            <button className="nav-icon-button" type="button" aria-label="Heart button">
+            <button className="nav-icon-button" type="button" aria-label="Heart button" disabled={!isOrderSetupComplete}>
               <img
                 src="/Hear.png"
                 alt="Heart"
@@ -376,9 +457,7 @@ export default function App() {
               />
             </button>
           </div>
-        </header>
-      </FadeDownNav>
-      <div className="navbar-spacer" aria-hidden="true"></div>
+      </header>
 
       {showOrderSetup && (
         <div className="order-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="order-setup-title">
@@ -483,18 +562,46 @@ export default function App() {
         </div>
       )}
 
-      <section className="hero container">
-        <StaggeredHeroTitle text={"fresh, daily,\nmindful"} />
-        
-        <FadeUpHeroContent delay={0.6}>
-          <div className="hero-subtitle">
-            <p className="mobile-subtitle" style={{ margin: 0, textAlign: 'inherit', whiteSpace: 'nowrap' }}>
-              handmade bakes, coffee &<br className="mobile-break-hidden" />
-              meals — served Wed-Sun at<br className="mobile-break-visible" />
-              <a href="#location" className="underline">Taman Cheras Indah, Kuala Lumpur</a>
-            </p>
+      <section className="carousel-section container" aria-label="Promotional banners">
+        <div
+          className="banner-carousel"
+          onTouchStart={handleCarouselTouchStart}
+          onTouchEnd={handleCarouselTouchEnd}
+        >
+          <div className="banner-track" style={{ transform: `translateX(-${activeBannerIndex * 100}%)` }}>
+            {bannerSlides.map((slide, index) => (
+              <button
+                key={slide.id}
+                type="button"
+                className="banner-slide"
+                onClick={() => setExpandedBannerIndex(index)}
+                aria-label={`View banner: ${slide.title}`}
+              >
+                <img src={slide.img} alt={slide.title} className="banner-slide-image" />
+                <span className="banner-slide-title">{slide.title}</span>
+              </button>
+            ))}
           </div>
-        </FadeUpHeroContent>
+
+          <button type="button" className="banner-nav banner-nav-prev" onClick={goToPreviousBanner} aria-label="Previous banner">
+            ‹
+          </button>
+          <button type="button" className="banner-nav banner-nav-next" onClick={goToNextBanner} aria-label="Next banner">
+            ›
+          </button>
+
+          <div className="banner-dots" role="tablist" aria-label="Banner selector">
+            {bannerSlides.map((slide, index) => (
+              <button
+                key={`${slide.id}-dot`}
+                type="button"
+                className={index === activeBannerIndex ? 'banner-dot active' : 'banner-dot'}
+                onClick={() => setActiveBannerIndex(index)}
+                aria-label={`Go to banner ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
       </section>
 
       <main className="main-content container">
@@ -542,9 +649,9 @@ export default function App() {
                   <p className="description" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     ESPRESSO, OAT MILK, CARAMEL DRIZZLE
                   </p>
-                  <p className="price">RM {PRODUCT_PRICE.toFixed(2)}</p>
 
                   <div className="product-card-actions">
+                    <p className="price">RM {PRODUCT_PRICE.toFixed(2)}</p>
                     {requiresPackSelection(product) && (
                       <div className="pack-selector" onClick={(event) => event.stopPropagation()}>
                         <div className="pack-buttons">
@@ -615,13 +722,12 @@ export default function App() {
               55300 Kuala Lumpur, Selangor
             </p>
             <div className="footer-social">
-              <div className="third-party-logo" aria-label="Third party partner">
-                <svg viewBox="0 0 48 48" className="third-party-icon" role="img" aria-hidden="true">
-                  <circle cx="24" cy="24" r="22" />
-                  <path d="M15 30l9-14 9 14h-4l-5-8-5 8z" fill="var(--background-color)" />
-                </svg>
-                <span>Third Party Partner</span>
-              </div>
+              <a href="https://www.facebook.com/labulabubakery" target="_blank" rel="noreferrer" style={{ marginRight: '10px' }}>
+                <img src="/fblogo.png" alt="Facebook" className="social-logo" />
+              </a>
+              <a href="https://www.instagram.com/labulabubakery" target="_blank" rel="noreferrer">
+                <img src="/instalogo.png" alt="Instagram" className="social-logo" />
+              </a>
             </div>
             <p className="phone">013-902 0018</p>
             <p className="email">labulabubakerycafe@gmail.com</p>
@@ -633,7 +739,7 @@ export default function App() {
         <p>Built with ❤️</p>
       </div>
 
-      <button className={`floating-cart-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart}>
+      <button className={`floating-cart-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart} disabled={!isOrderSetupComplete}>
         <svg viewBox="0 0 24 24" className="floating-cart-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 8h15l-1.5 9h-11z"></path>
           <path d="M6 8L4 4H2"></path>
@@ -684,6 +790,8 @@ export default function App() {
 
                 <div className="cart-footer">
                   <p className="cart-total">Subtotal: RM {cartSubtotal.toFixed(2)}</p>
+                  {deliveryFee > 0 && <p className="cart-fee">Delivery fee: RM {deliveryFee.toFixed(2)}</p>}
+                  <p className="cart-grand-total">Total: RM {cartGrandTotal.toFixed(2)}</p>
                   <button
                     type="button"
                     className="cart-proceed-button"
@@ -733,6 +841,8 @@ export default function App() {
                     </div>
                   )}
                   <p className="checkout-subtotal"><strong>Subtotal:</strong> RM {cartSubtotal.toFixed(2)}</p>
+                  {deliveryFee > 0 && <p className="checkout-subtotal"><strong>Delivery fee:</strong> RM {deliveryFee.toFixed(2)}</p>}
+                  <p className="checkout-subtotal"><strong>Total:</strong> RM {cartGrandTotal.toFixed(2)}</p>
                 </div>
 
                 <form className="checkout-form" onSubmit={proceedToPayment}>
@@ -815,6 +925,8 @@ export default function App() {
                     </div>
                   )}
                   <p><strong>Subtotal:</strong> RM {cartSubtotal.toFixed(2)}</p>
+                  {deliveryFee > 0 && <p><strong>Delivery fee:</strong> RM {deliveryFee.toFixed(2)}</p>}
+                  <p><strong>Total:</strong> RM {cartGrandTotal.toFixed(2)}</p>
                   <p><strong>Name:</strong> {customerDetails.name}</p>
                   <p><strong>Contact:</strong> {customerDetails.contactNumber}</p>
                   <p><strong>Address:</strong> {customerDetails.address}</p>
@@ -827,6 +939,21 @@ export default function App() {
               </div>
             )}
           </aside>
+        </div>
+      )}
+
+      {expandedBannerIndex !== null && (
+        <div className="banner-modal-overlay" onClick={() => setExpandedBannerIndex(null)} role="presentation">
+          <div className="banner-modal" role="dialog" aria-modal="true" aria-label="Expanded banner" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="banner-modal-close" onClick={() => setExpandedBannerIndex(null)} aria-label="Close banner preview">
+              Close
+            </button>
+            <img
+              src={bannerSlides[expandedBannerIndex].img}
+              alt={bannerSlides[expandedBannerIndex].title}
+              className="banner-modal-image"
+            />
+          </div>
         </div>
       )}
     </>
