@@ -37,8 +37,20 @@ export default function App() {
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
   const [expandedBannerIndex, setExpandedBannerIndex] = useState(null);
   const [touchStartX, setTouchStartX] = useState(null);
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
   const addFeedbackTimeoutRef = useRef(null);
   const cartPulseTimeoutRef = useRef(null);
+
+  const categoryOptions = [
+    'ALL',
+    'BALL',
+    'SPONGE CAKES',
+    'LOAF CAKES',
+    'ROLLS',
+    'WHOLE & SLICED CAKES',
+    'BOSTON PIE CAKES',
+    'COOKIES'
+  ];
 
   const outletOptions = [
     'Sunway Mentari - Bakery',
@@ -61,19 +73,43 @@ export default function App() {
       dateObj.setDate(today.getDate() + index);
       return {
         value: toInputDate(dateObj),
-        label: dateObj.toLocaleDateString('en-MY', {
-          weekday: 'short',
-          day: 'numeric',
-          month: 'short'
-        })
+        label: `${dateObj.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric'
+        })}, ${dateObj.toLocaleDateString('en-US', { weekday: 'short' })}`
       };
     });
   }, []);
 
   const products = [
-    { id: 1, category: 'BALL', title: 'CHICKEN FLOSSIE BALLS', img: '/backery/Chicken Flossie Balls.png' },
-    { id: 2, category: 'BALL', title: 'VEGETARIAN FLOSSIE BALLS', img: '/backery/Vegetarian Flossie Balls.png' },
-    { id: 3, category: 'BALL', title: 'SPICY SEAWEED CHICKEN FLOSSIE BALLS', img: '/backery/Chicken Flossie Balls.png' },
+    {
+      id: 1,
+      category: 'BALL',
+      title: 'CHICKEN FLOSSIE BALLS',
+      img: '/backery/Chicken Flossie Balls.png',
+      tags: [
+        { label: 'Best Seller', tone: 'highlight' },
+        { label: 'Contains Nuts', tone: 'warning' }
+      ]
+    },
+    {
+      id: 2,
+      category: 'BALL',
+      title: 'VEGETARIAN FLOSSIE BALLS',
+      img: '/backery/Vegetarian Flossie Balls.png',
+      tags: [
+        { label: 'New', tone: 'default' }
+      ]
+    },
+    {
+      id: 3,
+      category: 'BALL',
+      title: 'SPICY SEAWEED CHICKEN FLOSSIE BALLS',
+      img: '/backery/Chicken Flossie Balls.png',
+      tags: [
+        { label: 'Limited Edition', tone: 'highlight' }
+      ]
+    },
     { id: 4, category: 'WHOLE & SLICED CAKES', title: 'YAM CAKE', img: '/backery/Slice Yam Burnt Cheesecake.png' },
     { id: 5, category: 'WHOLE & SLICED CAKES', title: 'BLACK FOREST CAKE', img: '/backery/Dark Chocolate Sponge Cake (2).png' },
     { id: 6, category: 'SPONGE CAKES', title: 'DARK CHOCOLATE SPONGE CAKE', img: '/backery/Dark Chocolate Sponge Cake.png' },
@@ -130,6 +166,29 @@ export default function App() {
   const deliveryFee = effectiveOrderType === 'Delivery' ? 20 : 0;
   const cartGrandTotal = cartSubtotal + deliveryFee;
 
+  const formatProductTitle = (title) => title
+    .toLowerCase()
+    .split(' ')
+    .map((word) => (word ? `${word.charAt(0).toUpperCase()}${word.slice(1)}` : ''))
+    .join(' ');
+
+  const openOrderSetupIfIncomplete = () => {
+    if (isOrderSetupComplete) {
+      return false;
+    }
+
+    if (!selectedOutlet) {
+      setOrderSetupStep(1);
+    } else if (!selectedDate) {
+      setOrderSetupStep(2);
+    } else {
+      setOrderSetupStep(3);
+    }
+
+    setShowOrderSetup(true);
+    return true;
+  };
+
   const saveDummyOrderSelection = () => {
     if (!orderType || !selectedOutlet || !selectedDate) {
       return;
@@ -148,9 +207,6 @@ export default function App() {
 
   const chooseOrderType = (type) => {
     setOrderType(type);
-    setSelectedOutlet('');
-    setSelectedDate('');
-    setOrderSetupStep(2);
   };
 
   const handleOrderTypeToggle = (type) => {
@@ -163,6 +219,14 @@ export default function App() {
       return;
     }
     setSelectedDate('');
+    setOrderSetupStep(2);
+  };
+
+  const goToOrderMethodStep = () => {
+    if (!selectedDate) {
+      return;
+    }
+    setOrderType('');
     setOrderSetupStep(3);
   };
 
@@ -184,6 +248,10 @@ export default function App() {
   };
 
   const addToCart = (product) => {
+    if (openOrderSetupIfIncomplete()) {
+      return;
+    }
+
     const selectedPack = selectedPackForProduct(product);
 
     if (requiresPackSelection(product) && !selectedPack) {
@@ -208,7 +276,7 @@ export default function App() {
         {
           key: cartKey,
           id: product.id,
-          title: product.title,
+          title: formatProductTitle(product.title),
           image: product.img,
           packSize: selectedPack,
           quantity: 1,
@@ -273,7 +341,7 @@ export default function App() {
   };
 
   const openCart = () => {
-    if (!isOrderSetupComplete) {
+    if (openOrderSetupIfIncomplete()) {
       return;
     }
     setIsCartOpen(true);
@@ -286,6 +354,10 @@ export default function App() {
   };
 
   const goToCheckoutDetails = () => {
+    if (openOrderSetupIfIncomplete()) {
+      return;
+    }
+
     if (cartItems.length === 0) {
       return;
     }
@@ -370,6 +442,30 @@ export default function App() {
     setTouchStartX(null);
   };
 
+  const openCategoryDrawer = () => {
+    setIsCategoryDrawerOpen(true);
+  };
+
+  const chooseCategoryFromDrawer = (category) => {
+    setActiveCategory(category);
+    setIsCategoryDrawerOpen(false);
+  };
+
+  useEffect(() => {
+    if (!isCategoryDrawerOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsCategoryDrawerOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCategoryDrawerOpen]);
+
   return (
     <>
       <div className="top-banner">
@@ -378,13 +474,13 @@ export default function App() {
 
       <header className="navbar">
           <div className="nav-left nav-left-desktop">
-            <button className="nav-icon-button" type="button" aria-label="Smiling face button" disabled={!isOrderSetupComplete}>
+            <button className="nav-icon-button" type="button" aria-label="Open category menu" onClick={openCategoryDrawer}>
               <img src="/smiling face.png" alt="Smiling face" className="nav-icon" />
             </button>
           </div>
 
           <div className="nav-mobile-left" aria-hidden="true">
-            <button className="mobile-nav-icon-button mobile-smile-button" type="button" aria-label="Smiling face" disabled={!isOrderSetupComplete}>
+            <button className="mobile-nav-icon-button mobile-smile-button" type="button" aria-label="Open category menu" onClick={openCategoryDrawer}>
               <img src="/smiling face.png" alt="Smiling face" className="mobile-smile-icon" />
             </button>
           </div>
@@ -400,7 +496,6 @@ export default function App() {
                 type="button"
                 className={effectiveOrderType === 'Self Collect' ? 'mobile-order-toggle-btn active' : 'mobile-order-toggle-btn'}
                 onClick={() => handleOrderTypeToggle('Self Collect')}
-                disabled={!isOrderSetupComplete}
               >
                 SC
               </button>
@@ -408,12 +503,11 @@ export default function App() {
                 type="button"
                 className={effectiveOrderType === 'Delivery' ? 'mobile-order-toggle-btn active' : 'mobile-order-toggle-btn'}
                 onClick={() => handleOrderTypeToggle('Delivery')}
-                disabled={!isOrderSetupComplete}
               >
                 D
               </button>
             </div>
-            <button className={`mobile-nav-icon-button mobile-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Cart" onClick={openCart} disabled={!isOrderSetupComplete}>
+            <button className={`mobile-nav-icon-button mobile-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Cart" onClick={openCart}>
               <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 8h15l-1.5 9h-11z"></path>
                 <path d="M6 8L4 4H2"></path>
@@ -428,7 +522,6 @@ export default function App() {
                 type="button"
                 className={effectiveOrderType === 'Self Collect' ? 'nav-order-toggle-btn active' : 'nav-order-toggle-btn'}
                 onClick={() => handleOrderTypeToggle('Self Collect')}
-                disabled={!isOrderSetupComplete}
               >
                 Self Collect
               </button>
@@ -436,19 +529,18 @@ export default function App() {
                 type="button"
                 className={effectiveOrderType === 'Delivery' ? 'nav-order-toggle-btn active' : 'nav-order-toggle-btn'}
                 onClick={() => handleOrderTypeToggle('Delivery')}
-                disabled={!isOrderSetupComplete}
               >
                 Delivery
               </button>
             </div>
-            <button className={`nav-icon-button nav-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart} disabled={!isOrderSetupComplete}>
+            <button className={`nav-icon-button nav-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart}>
               <svg viewBox="0 0 24 24" className="nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 8h15l-1.5 9h-11z"></path>
                 <path d="M6 8L4 4H2"></path>
               </svg>
               <span className="desktop-cart-badge">{totalCartQuantity}</span>
             </button>
-            <button className="nav-icon-button" type="button" aria-label="Heart button" disabled={!isOrderSetupComplete}>
+            <button className="nav-icon-button" type="button" aria-label="Heart button">
               <img
                 src="/Hear.png"
                 alt="Heart"
@@ -462,6 +554,15 @@ export default function App() {
       {showOrderSetup && (
         <div className="order-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="order-setup-title">
           <div className={`order-setup-modal${orderSetupStep > 1 ? ' with-back' : ''}`}>
+            <button
+              type="button"
+              className="modal-close-button"
+              onClick={() => setShowOrderSetup(false)}
+              aria-label="Close order setup"
+            >
+              X
+            </button>
+
             {orderSetupStep > 1 && (
               <button
                 type="button"
@@ -480,30 +581,6 @@ export default function App() {
             </div>
 
             {orderSetupStep === 1 && (
-              <div className="order-frame">
-                <h2 id="order-setup-title">Choose order type</h2>
-                <div className="order-step">
-                  <div className="order-type-options">
-                    <button
-                      type="button"
-                      className="option-button"
-                      onClick={() => chooseOrderType('Delivery')}
-                    >
-                      Delivery
-                    </button>
-                    <button
-                      type="button"
-                      className="option-button"
-                      onClick={() => chooseOrderType('Self Collect')}
-                    >
-                      Self Collect
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {orderSetupStep === 2 && (
               <div className="order-frame">
                 <h2 id="order-setup-title">Choose outlet</h2>
                 <div className="order-step">
@@ -531,7 +608,7 @@ export default function App() {
               </div>
             )}
 
-            {orderSetupStep === 3 && (
+            {orderSetupStep === 2 && (
               <div className="order-frame">
                 <h2 id="order-setup-title">Choose date</h2>
                 <div className="order-step">
@@ -551,8 +628,40 @@ export default function App() {
                 <button
                   type="button"
                   className="confirm-order-setup"
-                  onClick={saveDummyOrderSelection}
+                  onClick={goToOrderMethodStep}
                   disabled={!selectedDate}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+
+            {orderSetupStep === 3 && (
+              <div className="order-frame">
+                <h2 id="order-setup-title">Choose order method</h2>
+                <div className="order-step">
+                  <div className="order-type-options">
+                    <button
+                      type="button"
+                      className={orderType === 'Delivery' ? 'option-button active' : 'option-button'}
+                      onClick={() => chooseOrderType('Delivery')}
+                    >
+                      Delivery
+                    </button>
+                    <button
+                      type="button"
+                      className={orderType === 'Self Collect' ? 'option-button active' : 'option-button'}
+                      onClick={() => chooseOrderType('Self Collect')}
+                    >
+                      Self Collect
+                    </button>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="confirm-order-setup"
+                  onClick={saveDummyOrderSelection}
+                  disabled={!orderType}
                 >
                   Confirm options
                 </button>
@@ -605,18 +714,24 @@ export default function App() {
       </section>
 
       <main className="main-content container">
-        <aside className="sidebar">
-          <ul className="filter-list">
-              <li><a href="#" className={activeCategory === 'ALL' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('ALL'); }}>ALL</a></li>
-              <li><a href="#" className={activeCategory === 'BALL' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('BALL'); }}>BALLS</a></li>
-              <li><a href="#" className={activeCategory === 'SPONGE CAKES' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('SPONGE CAKES'); }}>SPONGE CAKES</a></li>
-              <li><a href="#" className={activeCategory === 'LOAF CAKES' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('LOAF CAKES'); }}>LOAF CAKES</a></li>
-              <li><a href="#" className={activeCategory === 'ROLLS' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('ROLLS'); }}>ROLLS</a></li>
-              <li><a href="#" className={activeCategory === 'WHOLE & SLICED CAKES' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('WHOLE & SLICED CAKES'); }}>WHOLE & SLICED CAKES</a></li>
-              <li><a href="#" className={activeCategory === 'BOSTON PIE CAKES' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('BOSTON PIE CAKES'); }}>BOSTON PIE CAKES</a></li>
-              <li><a href="#" className={activeCategory === 'COOKIES' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveCategory('COOKIES'); }}>COOKIES</a></li>
+        <section className="top-category-bar" aria-label="Product categories">
+          <ul className="filter-list top-filter-list">
+              {categoryOptions.map((category) => (
+                <li key={category}>
+                  <a
+                    href="#"
+                    className={activeCategory === category ? 'active' : ''}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveCategory(category);
+                    }}
+                  >
+                    {category === 'BALL' ? 'BALLS' : category}
+                  </a>
+                </li>
+              ))}
           </ul>
-        </aside>
+        </section>
 
         <div className="product-grid">
           {filteredProducts.map((product, index) => (
@@ -632,11 +747,23 @@ export default function App() {
                 tabIndex={0}
                 onClick={() => addToCart(product)}
                 onKeyDown={(event) => handleCardKeyDown(event, product)}
-                aria-label={`Add ${product.title} to cart`}
+                aria-label={`Add ${formatProductTitle(product.title)} to cart`}
               >
                 <div className="card-image-wrapper">
+                  {Array.isArray(product.tags) && product.tags.length > 0 && (
+                    <div className="product-tag-stack" aria-label="Product tags">
+                      {product.tags.map((tag) => (
+                        <span
+                          key={`${product.id}-${tag.label}`}
+                          className={tag.tone ? `product-tag ${tag.tone}` : 'product-tag'}
+                        >
+                          {tag.label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {product.img ? (
-                    <img src={product.img} alt={product.title} className="product-image" />
+                    <img src={product.img} alt={formatProductTitle(product.title)} className="product-image" />
                   ) : (
                     <div className="image-placeholder"></div>
                   )}
@@ -645,7 +772,7 @@ export default function App() {
                   </span>
                 </div>
                 <div className="card-content">
-                  <h3 className="product-title">{product.title}</h3>
+                  <h3 className="product-title">{formatProductTitle(product.title)}</h3>
                   <p className="description" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     ESPRESSO, OAT MILK, CARAMEL DRIZZLE
                   </p>
@@ -694,17 +821,25 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="site-footer container">
-        <div className="footer-top">
-          <img src="/labulogo.png" alt="Labu+labu" className="large-footer-logo-img" onError={(e) => e.target.outerHTML='<h1 class="large-footer-logo">Labu+labu</h1>'} />
-          <div className="footer-subtitle">
-            <p>
-              handmade bakes, coffee &<br />
-              meals
-            </p>
-          </div>
+      <section className="faq-section container" aria-labelledby="faq-title">
+        <h2 id="faq-title">FAQ</h2>
+        <div className="faq-grid">
+          <details className="faq-item" open>
+            <summary>How early should I place my order?</summary>
+            <p>Please place your order at least 1 day in advance for best availability.</p>
+          </details>
+          <details className="faq-item">
+            <summary>Can I switch between delivery and self collect?</summary>
+            <p>Yes. You can switch before checkout. Delivery orders include RM 20 delivery fee.</p>
+          </details>
+          <details className="faq-item">
+            <summary>Can I request same-day orders?</summary>
+            <p>Selected items may be available the same day depending on stock and production schedule.</p>
+          </details>
         </div>
+      </section>
 
+      <footer className="site-footer container">
         <div className="footer-content" id="contact">
           <div className="map-placeholder">
             Map Image Placeholder
@@ -739,7 +874,7 @@ export default function App() {
         <p>Built with ❤️</p>
       </div>
 
-      <button className={`floating-cart-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart} disabled={!isOrderSetupComplete}>
+      <button className={`floating-cart-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart}>
         <svg viewBox="0 0 24 24" className="floating-cart-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 8h15l-1.5 9h-11z"></path>
           <path d="M6 8L4 4H2"></path>
@@ -941,6 +1076,43 @@ export default function App() {
           </aside>
         </div>
       )}
+
+      <div
+        className={isCategoryDrawerOpen ? 'category-drawer-overlay is-open' : 'category-drawer-overlay'}
+        onClick={() => setIsCategoryDrawerOpen(false)}
+        role="presentation"
+        aria-hidden={!isCategoryDrawerOpen}
+      >
+        <aside
+          className={isCategoryDrawerOpen ? 'category-drawer is-open' : 'category-drawer'}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Category menu"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="category-drawer-top-row">
+            <button type="button" className="category-drawer-close-inline" onClick={() => setIsCategoryDrawerOpen(false)}>
+              <span aria-hidden="true">×</span>
+              <span>Close</span>
+            </button>
+          </div>
+
+          <ul className="category-drawer-list">
+            {categoryOptions.map((category) => (
+              <li key={`drawer-${category}`}>
+                <button
+                  type="button"
+                  className={activeCategory === category ? 'category-drawer-item active' : 'category-drawer-item'}
+                  onClick={() => chooseCategoryFromDrawer(category)}
+                >
+                  <span>{category === 'BALL' ? 'BALLS' : category}</span>
+                  <span className="category-drawer-chevron" aria-hidden="true">›</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </div>
 
       {expandedBannerIndex !== null && (
         <div className="banner-modal-overlay" onClick={() => setExpandedBannerIndex(null)} role="presentation">
