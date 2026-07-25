@@ -55,7 +55,7 @@ export default function App() {
 
   const outletOptions = [
     'Sunway Mentari - Bakery',
-    'Musa Sentral - Bakery',
+    'Nusa Sentral - Bakery',
     'Taman Indah Cheras - Cafe'
   ];
 
@@ -81,6 +81,17 @@ export default function App() {
       };
     });
   }, []);
+
+  const toInputDate = (dateObj) => {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isSameDaySelfCollectOutlet = (outletName) => (
+    outletName === 'Nusa Sentral - Bakery' || outletName === 'Taman Indah Cheras - Cafe'
+  );
 
   const products = [
     {
@@ -218,6 +229,24 @@ export default function App() {
     if (!selectedOutlet) {
       return;
     }
+
+    if (isSameDaySelfCollectOutlet(selectedOutlet)) {
+      const todayValue = toInputDate(new Date());
+      const fixedOrderType = 'Self Collect';
+
+      setSelectedDate(todayValue);
+      setOrderType(fixedOrderType);
+
+      setDummyOrderSelection({
+        orderType: fixedOrderType,
+        outlet: selectedOutlet,
+        date: todayValue,
+        savedAt: new Date().toISOString()
+      });
+      setShowOrderSetup(false);
+      return;
+    }
+
     setSelectedDate('');
     setOrderSetupStep(2);
   };
