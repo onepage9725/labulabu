@@ -44,7 +44,7 @@ a {
 }
 
 /* Typography styles matching the design */
-.category, .badge, .description, .filter-list a, .menu-link, .top-banner, .price {
+.category, .badge, .filter-list a, .menu-link, .top-banner, .price {
     font-family: var(--font-heading);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -479,6 +479,11 @@ a {
     background: rgba(206, 195, 176, 0.12);
 }
 
+.option-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .outlet-options {
     display: grid;
     gap: 10px;
@@ -509,6 +514,20 @@ a {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
+}
+
+.date-options.restricted {
+    grid-template-columns: minmax(220px, 320px);
+    justify-content: center;
+}
+
+.outlet-restriction-note {
+    margin-top: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--secondary-color);
+    text-align: center;
+    opacity: 0.9;
 }
 
 .date-option-button {

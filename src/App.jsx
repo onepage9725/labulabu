@@ -147,6 +147,9 @@ export default function App() {
     ? products 
     : products.filter(product => product.category === activeCategory);
 
+  const isRestrictedOutlet = isSameDaySelfCollectOutlet(selectedOutlet);
+  const visibleDateOptions = isRestrictedOutlet ? dateOptions.slice(0, 1) : dateOptions;
+
   const totalCartQuantity = useMemo(
     () => cartItems.reduce((total, item) => total + item.quantity, 0),
     [cartItems]
@@ -232,18 +235,9 @@ export default function App() {
 
     if (isSameDaySelfCollectOutlet(selectedOutlet)) {
       const todayValue = toInputDate(new Date());
-      const fixedOrderType = 'Self Collect';
-
       setSelectedDate(todayValue);
-      setOrderType(fixedOrderType);
-
-      setDummyOrderSelection({
-        orderType: fixedOrderType,
-        outlet: selectedOutlet,
-        date: todayValue,
-        savedAt: new Date().toISOString()
-      });
-      setShowOrderSetup(false);
+      setOrderType('Self Collect');
+      setOrderSetupStep(2);
       return;
     }
 
@@ -255,6 +249,13 @@ export default function App() {
     if (!selectedDate) {
       return;
     }
+
+    if (isSameDaySelfCollectOutlet(selectedOutlet)) {
+      setOrderType('Self Collect');
+      setOrderSetupStep(3);
+      return;
+    }
+
     setOrderType('');
     setOrderSetupStep(3);
   };
@@ -620,9 +621,14 @@ export default function App() {
             {orderSetupStep === 2 && (
               <div className="order-frame">
                 <h2 id="order-setup-title">Choose date</h2>
+                {isRestrictedOutlet && (
+                  <p className="outlet-restriction-note">
+                    For the selected outlets, only same-day delivery or self collect is available.
+                  </p>
+                )}
                 <div className="order-step">
-                  <div className="date-options">
-                    {dateOptions.map((dateOption) => (
+                  <div className={isRestrictedOutlet ? 'date-options restricted' : 'date-options'}>
+                    {visibleDateOptions.map((dateOption) => (
                       <button
                         key={dateOption.value}
                         type="button"
@@ -654,6 +660,7 @@ export default function App() {
                       type="button"
                       className={orderType === 'Delivery' ? 'option-button active' : 'option-button'}
                       onClick={() => chooseOrderType('Delivery')}
+                      disabled={isRestrictedOutlet}
                     >
                       Delivery
                     </button>
@@ -783,7 +790,7 @@ export default function App() {
                 <div className="card-content">
                   <h3 className="product-title">{formatProductTitle(product.title)}</h3>
                   <p className="description" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    ESPRESSO, OAT MILK, CARAMEL DRIZZLE
+                    Espresso, Oat Milk, Caramel, Drizzle
                   </p>
 
                   <div className="product-card-actions">
