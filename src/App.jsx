@@ -839,18 +839,59 @@ export default function App() {
 
       <section className="faq-section container" aria-labelledby="faq-title">
         <h2 id="faq-title">FAQ</h2>
-        <div className="faq-grid">
-          <details className="faq-item" open>
-            <summary>How early should I place my order?</summary>
-            <p>Please place your order at least 1 day in advance for best availability.</p>
+        <div className="faq-grid faq-category-grid">
+          <details className="faq-category" open>
+            <summary>Product</summary>
+            <div className="faq-category-content">
+              <details className="faq-item" open>
+                <summary>How early should I place my order?</summary>
+                <p>Please place your order at least 1 day in advance for best availability.</p>
+              </details>
+              <details className="faq-item">
+                <summary>Can I request same-day orders?</summary>
+                <p>Selected items may be available the same day depending on stock and production schedule.</p>
+              </details>
+              <details className="faq-item">
+                <summary>Can I customize cake wording?</summary>
+                <p>Short wording requests are available for selected whole cakes. Add your note in checkout remark.</p>
+              </details>
+            </div>
           </details>
-          <details className="faq-item">
-            <summary>Can I switch between delivery and self collect?</summary>
-            <p>Yes. You can switch before checkout. Delivery orders include RM 20 delivery fee.</p>
+
+          <details className="faq-category">
+            <summary>Delivery</summary>
+            <div className="faq-category-content">
+              <details className="faq-item" open>
+                <summary>How much is delivery fee?</summary>
+                <p>Delivery orders include a flat RM 20 delivery fee.</p>
+              </details>
+              <details className="faq-item">
+                <summary>Can I change delivery address after placing order?</summary>
+                <p>You can update it before payment confirmation by editing your checkout details.</p>
+              </details>
+              <details className="faq-item">
+                <summary>Is delivery available for all outlets?</summary>
+                <p>Nusa Sentral and Taman Indah Cheras are same-day self collect only.</p>
+              </details>
+            </div>
           </details>
-          <details className="faq-item">
-            <summary>Can I request same-day orders?</summary>
-            <p>Selected items may be available the same day depending on stock and production schedule.</p>
+
+          <details className="faq-category">
+            <summary>Self Collect</summary>
+            <div className="faq-category-content">
+              <details className="faq-item" open>
+                <summary>How do I choose a pickup time?</summary>
+                <p>Choose your outlet and date first, then our team will confirm the pickup timing.</p>
+              </details>
+              <details className="faq-item">
+                <summary>Can someone else collect on my behalf?</summary>
+                <p>Yes, share your order name and contact number with the person collecting.</p>
+              </details>
+              <details className="faq-item">
+                <summary>Can I switch between delivery and self collect?</summary>
+                <p>Yes, you can update order method before completing checkout.</p>
+              </details>
+            </div>
           </details>
         </div>
       </section>

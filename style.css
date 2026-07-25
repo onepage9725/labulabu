@@ -1567,6 +1567,44 @@ a {
     gap: 10px;
 }
 
+.faq-category-grid {
+    gap: 12px;
+}
+
+.faq-category {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px 12px;
+}
+
+.faq-category > summary {
+    list-style: none;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 17px;
+}
+
+.faq-category > summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-category > summary::after {
+    content: '+';
+    float: right;
+    opacity: 0.7;
+}
+
+.faq-category[open] > summary::after {
+    content: '−';
+}
+
+.faq-category-content {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+}
+
 .faq-item {
     border: 1px solid var(--border-color);
     border-radius: 10px;
