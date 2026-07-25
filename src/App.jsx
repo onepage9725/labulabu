@@ -841,7 +841,7 @@ export default function App() {
         <h2 id="faq-title">FAQ</h2>
         <div className="faq-grid faq-category-grid">
           <details className="faq-category" open>
-            <summary>Product</summary>
+            <summary>About Product</summary>
             <div className="faq-category-content">
               <details className="faq-item" open>
                 <summary>How early should I place my order?</summary>
@@ -859,7 +859,7 @@ export default function App() {
           </details>
 
           <details className="faq-category">
-            <summary>Delivery</summary>
+            <summary>About Delivery</summary>
             <div className="faq-category-content">
               <details className="faq-item" open>
                 <summary>How much is delivery fee?</summary>
@@ -877,7 +877,7 @@ export default function App() {
           </details>
 
           <details className="faq-category">
-            <summary>Self Collect</summary>
+            <summary>About Self Collect</summary>
             <div className="faq-category-content">
               <details className="faq-item" open>
                 <summary>How do I choose a pickup time?</summary>
