@@ -38,6 +38,7 @@ export default function App() {
   const [expandedBannerIndex, setExpandedBannerIndex] = useState(null);
   const [touchStartX, setTouchStartX] = useState(null);
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const [isAccountPromptOpen, setIsAccountPromptOpen] = useState(false);
   const addFeedbackTimeoutRef = useRef(null);
   const cartPulseTimeoutRef = useRef(null);
 
@@ -88,8 +89,7 @@ export default function App() {
       title: 'CHICKEN FLOSSIE BALLS',
       img: '/backery/Chicken Flossie Balls.png',
       tags: [
-        { label: 'Best Seller', tone: 'highlight' },
-        { label: 'Contains Nuts', tone: 'warning' }
+        { label: 'Best Seller', tone: 'highlight' }
       ]
     },
     {
@@ -209,9 +209,9 @@ export default function App() {
     setOrderType(type);
   };
 
-  const handleOrderTypeToggle = (type) => {
-    setOrderType(type);
-    setDummyOrderSelection((current) => (current ? { ...current, orderType: type } : current));
+  const openOrderSetupEditor = () => {
+    setOrderSetupStep(1);
+    setShowOrderSetup(true);
   };
 
   const goToDateStep = () => {
@@ -451,6 +451,15 @@ export default function App() {
     setIsCategoryDrawerOpen(false);
   };
 
+  const closeAccountPrompt = () => {
+    setIsAccountPromptOpen(false);
+  };
+
+  const handleAccountLoginSubmit = (event) => {
+    event.preventDefault();
+    setIsAccountPromptOpen(false);
+  };
+
   useEffect(() => {
     if (!isCategoryDrawerOpen) {
       return undefined;
@@ -475,13 +484,21 @@ export default function App() {
       <header className="navbar">
           <div className="nav-left nav-left-desktop">
             <button className="nav-icon-button" type="button" aria-label="Open category menu" onClick={openCategoryDrawer}>
-              <img src="/smiling face.png" alt="Smiling face" className="nav-icon" />
+              <svg viewBox="0 0 24 24" className="nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
             </button>
           </div>
 
           <div className="nav-mobile-left" aria-hidden="true">
             <button className="mobile-nav-icon-button mobile-smile-button" type="button" aria-label="Open category menu" onClick={openCategoryDrawer}>
-              <img src="/smiling face.png" alt="Smiling face" className="mobile-smile-icon" />
+              <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
             </button>
           </div>
 
@@ -491,61 +508,24 @@ export default function App() {
           </div>
 
           <div className="nav-mobile-right" aria-hidden="true">
-            <div className="mobile-order-toggle" role="group" aria-label="Choose order type">
-              <button
-                type="button"
-                className={effectiveOrderType === 'Self Collect' ? 'mobile-order-toggle-btn active' : 'mobile-order-toggle-btn'}
-                onClick={() => handleOrderTypeToggle('Self Collect')}
-              >
-                SC
-              </button>
-              <button
-                type="button"
-                className={effectiveOrderType === 'Delivery' ? 'mobile-order-toggle-btn active' : 'mobile-order-toggle-btn'}
-                onClick={() => handleOrderTypeToggle('Delivery')}
-              >
-                D
-              </button>
-            </div>
-            <button className={`mobile-nav-icon-button mobile-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Cart" onClick={openCart}>
-              <svg viewBox="0 0 24 24" className="mobile-nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 8h15l-1.5 9h-11z"></path>
-                <path d="M6 8L4 4H2"></path>
-              </svg>
-              <span className="mobile-cart-badge">{totalCartQuantity}</span>
+            <button type="button" className="mobile-order-setup-button" onClick={openOrderSetupEditor}>
+              Edit Order
+            </button>
+            <button className="mobile-nav-icon-button mobile-account-icon-button" type="button" aria-label="Account options" onClick={() => setIsAccountPromptOpen(true)}>
+              <img src="/smiling face.png" alt="Smiling face" className="mobile-smile-icon" />
             </button>
           </div>
 
           <div className="nav-right nav-right-desktop">
-            <div className="nav-order-toggle" role="group" aria-label="Choose order type">
-              <button
-                type="button"
-                className={effectiveOrderType === 'Self Collect' ? 'nav-order-toggle-btn active' : 'nav-order-toggle-btn'}
-                onClick={() => handleOrderTypeToggle('Self Collect')}
-              >
-                Self Collect
-              </button>
-              <button
-                type="button"
-                className={effectiveOrderType === 'Delivery' ? 'nav-order-toggle-btn active' : 'nav-order-toggle-btn'}
-                onClick={() => handleOrderTypeToggle('Delivery')}
-              >
-                Delivery
-              </button>
-            </div>
-            <button className={`nav-icon-button nav-cart-icon-button${cartPulse ? ' cart-pulse' : ''}`} type="button" aria-label="Open cart" onClick={openCart}>
-              <svg viewBox="0 0 24 24" className="nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 8h15l-1.5 9h-11z"></path>
-                <path d="M6 8L4 4H2"></path>
-              </svg>
-              <span className="desktop-cart-badge">{totalCartQuantity}</span>
+            <button type="button" className="nav-order-setup-button" onClick={openOrderSetupEditor}>
+              {dummyOrderSelection ? 'Change Outlet/Date/Order' : 'Set Outlet/Date/Order'}
             </button>
-            <button className="nav-icon-button" type="button" aria-label="Heart button">
+            <button className="nav-icon-button" type="button" aria-label="Account options" onClick={() => setIsAccountPromptOpen(true)}>
               <img
-                src="/Hear.png"
-                alt="Heart"
+                src="/smiling face.png"
+                alt="Smiling face"
                 className="nav-icon"
-                onError={(e) => { e.currentTarget.src = '/backery/backeryupdate/Heart.png'; }}
+                onError={(e) => { e.currentTarget.src = '/backery/backeryupdate/smiling face.png'; }}
               />
             </button>
           </div>
@@ -1074,6 +1054,32 @@ export default function App() {
               </div>
             )}
           </aside>
+        </div>
+      )}
+
+      {isAccountPromptOpen && (
+        <div className="account-prompt-overlay" onClick={closeAccountPrompt} role="presentation">
+          <div className="account-prompt-modal" role="dialog" aria-modal="true" aria-label="Account options" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="account-prompt-close" onClick={closeAccountPrompt} aria-label="Close account options">×</button>
+            <h3>Login</h3>
+            <p>Sign in to continue your order.</p>
+
+            <form className="account-login-form" onSubmit={handleAccountLoginSubmit}>
+              <label htmlFor="accountEmail">Email</label>
+              <input id="accountEmail" name="email" type="email" placeholder="name@email.com" required />
+
+              <label htmlFor="accountPassword">Password</label>
+              <input id="accountPassword" name="password" type="password" placeholder="Enter your password" required />
+
+              <button type="submit" className="account-action-button primary">Login</button>
+            </form>
+
+            <div className="account-text-links">
+              <button type="button" className="account-link-button" onClick={closeAccountPrompt}>Sign Up</button>
+              <button type="button" className="account-link-button" onClick={closeAccountPrompt}>Forgot Password?</button>
+              <button type="button" className="account-guest-link" onClick={closeAccountPrompt}>Continue as Guest</button>
+            </div>
+          </div>
         </div>
       )}
 
