@@ -2059,11 +2059,17 @@ a {
         font-size: 12px;
     }
     .order-filter-menu {
-        left: 50%;
+        left: 0;
         right: auto;
-        transform: translateX(-50%);
-        min-width: min(86vw, 320px);
+        transform: none;
+        min-width: max(100%, 230px);
+        width: max-content;
+        max-width: calc(100vw - 16px);
         max-height: min(260px, 48vh);
+    }
+    .order-filter-field:last-child .order-filter-menu {
+        left: auto;
+        right: 0;
     }
     .carousel-section {
         padding-top: 14px;
@@ -2110,7 +2116,8 @@ a {
         padding: 6px 7px;
     }
     .order-filter-menu {
-        min-width: min(90vw, 300px);
+        min-width: max(100%, 210px);
+        max-width: calc(100vw - 12px);
         max-height: min(220px, 44vh);
     }
     .navbar {
