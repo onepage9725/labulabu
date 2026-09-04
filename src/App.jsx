@@ -14,8 +14,9 @@ const SPECIAL_PACK_PRODUCTS = new Set([
 const PRODUCT_PRICE = 20;
 
 export default function App() {
+  const navbarRef = useRef(null);
+  const orderFilterRef = useRef(null);
   const [activeCategory, setActiveCategory] = useState('ALL');
-  const [showOrderSetup, setShowOrderSetup] = useState(true);
   const [orderSetupStep, setOrderSetupStep] = useState(1);
   const [orderType, setOrderType] = useState('');
   const [selectedOutlet, setSelectedOutlet] = useState('');
@@ -39,6 +40,7 @@ export default function App() {
   const [touchStartX, setTouchStartX] = useState(null);
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
   const [isAccountPromptOpen, setIsAccountPromptOpen] = useState(false);
+  const [openFilterDropdown, setOpenFilterDropdown] = useState('');
   const addFeedbackTimeoutRef = useRef(null);
   const cartPulseTimeoutRef = useRef(null);
 
@@ -186,21 +188,20 @@ export default function App() {
     .map((word) => (word ? `${word.charAt(0).toUpperCase()}${word.slice(1)}` : ''))
     .join(' ');
 
+  const formatCategoryLabel = (category) => {
+    if (category === 'BALL') {
+      return 'Balls';
+    }
+
+    return category
+      .toLowerCase()
+      .split(' ')
+      .map((word) => (word === '&' ? '&' : `${word.charAt(0).toUpperCase()}${word.slice(1)}`))
+      .join(' ');
+  };
+
   const openOrderSetupIfIncomplete = () => {
-    if (isOrderSetupComplete) {
-      return false;
-    }
-
-    if (!selectedOutlet) {
-      setOrderSetupStep(1);
-    } else if (!selectedDate) {
-      setOrderSetupStep(2);
-    } else {
-      setOrderSetupStep(3);
-    }
-
-    setShowOrderSetup(true);
-    return true;
+    return false;
   };
 
   const saveDummyOrderSelection = () => {
@@ -216,16 +217,10 @@ export default function App() {
     };
 
     setDummyOrderSelection(dummyData);
-    setShowOrderSetup(false);
   };
 
   const chooseOrderType = (type) => {
     setOrderType(type);
-  };
-
-  const openOrderSetupEditor = () => {
-    setOrderSetupStep(1);
-    setShowOrderSetup(true);
   };
 
   const goToDateStep = () => {
@@ -485,6 +480,55 @@ export default function App() {
     setIsAccountPromptOpen(false);
   };
 
+  const selectedDateLabel = dateOptions.find((option) => option.value === selectedDate)?.label || 'Choose date';
+
+  const syncOrderSelection = (nextOrderType, nextOutlet, nextDate) => {
+    if (nextOrderType && nextOutlet && nextDate) {
+      setDummyOrderSelection({
+        orderType: nextOrderType,
+        outlet: nextOutlet,
+        date: nextDate,
+        savedAt: new Date().toISOString()
+      });
+      return;
+    }
+
+    setDummyOrderSelection(null);
+  };
+
+  const handleOutletFilterChange = (nextOutlet) => {
+    const restrictedOutlet = isSameDaySelfCollectOutlet(nextOutlet);
+    const todayValue = toInputDate(new Date());
+    const nextDate = restrictedOutlet ? todayValue : selectedDate;
+    const nextOrderType = restrictedOutlet ? 'Self Collect' : orderType;
+
+    setSelectedOutlet(nextOutlet);
+    setSelectedDate(nextDate);
+    setOrderType(nextOrderType);
+    syncOrderSelection(nextOrderType, nextOutlet, nextDate);
+    setOpenFilterDropdown('');
+  };
+
+  const handleDateFilterChange = (nextDate) => {
+    setSelectedDate(nextDate);
+    syncOrderSelection(orderType, selectedOutlet, nextDate);
+    setOpenFilterDropdown('');
+  };
+
+  const handleOrderTypeFilterChange = (nextOrderType) => {
+    setOrderType(nextOrderType);
+    syncOrderSelection(nextOrderType, selectedOutlet, selectedDate);
+    setOpenFilterDropdown('');
+  };
+
+  const toggleFilterDropdown = (dropdownName) => {
+    setOpenFilterDropdown((current) => (current === dropdownName ? '' : dropdownName));
+  };
+
+  const closeFilterDropdowns = () => {
+    setOpenFilterDropdown('');
+  };
+
   const handleAccountLoginSubmit = (event) => {
     event.preventDefault();
     setIsAccountPromptOpen(false);
@@ -505,13 +549,66 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isCategoryDrawerOpen]);
 
+  useEffect(() => {
+    if (!navbarRef.current || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const updateNavHeight = () => {
+      const navHeight = Math.ceil(navbarRef.current.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--navbar-height', `${navHeight}px`);
+    };
+
+    updateNavHeight();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateNavHeight();
+    });
+
+    resizeObserver.observe(navbarRef.current);
+    window.addEventListener('resize', updateNavHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateNavHeight);
+      document.documentElement.style.removeProperty('--navbar-height');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!openFilterDropdown) {
+      return undefined;
+    }
+
+    const handleOutsideClick = (event) => {
+      if (!orderFilterRef.current || orderFilterRef.current.contains(event.target)) {
+        return;
+      }
+      closeFilterDropdowns();
+    };
+
+    const handleEscapeClose = (event) => {
+      if (event.key === 'Escape') {
+        closeFilterDropdowns();
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('keydown', handleEscapeClose);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('keydown', handleEscapeClose);
+    };
+  }, [openFilterDropdown]);
+
   return (
     <>
       <div className="top-banner">
         <span style={{ color: 'var(--secondary-color)' }}>ORDER FRESH BAKE HERE</span>
       </div>
 
-      <header className="navbar">
+      <header className="navbar" ref={navbarRef}>
           <div className="nav-left nav-left-desktop">
             <button className="nav-icon-button" type="button" aria-label="Open category menu" onClick={openCategoryDrawer}>
               <svg viewBox="0 0 24 24" className="nav-icon" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -538,18 +635,12 @@ export default function App() {
           </div>
 
           <div className="nav-mobile-right" aria-hidden="true">
-            <button type="button" className="mobile-order-setup-button" onClick={openOrderSetupEditor}>
-              Edit Order
-            </button>
             <button className="mobile-nav-icon-button mobile-account-icon-button" type="button" aria-label="Account options" onClick={() => setIsAccountPromptOpen(true)}>
               <img src="/smiling face.png" alt="Smiling face" className="mobile-smile-icon" />
             </button>
           </div>
 
           <div className="nav-right nav-right-desktop">
-            <button type="button" className="nav-order-setup-button" onClick={openOrderSetupEditor}>
-              {dummyOrderSelection ? 'Change Outlet/Date/Order' : 'Set Outlet/Date/Order'}
-            </button>
             <button className="nav-icon-button" type="button" aria-label="Account options" onClick={() => setIsAccountPromptOpen(true)}>
               <img
                 src="/smiling face.png"
@@ -561,131 +652,118 @@ export default function App() {
           </div>
       </header>
 
-      {showOrderSetup && (
-        <div className="order-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="order-setup-title">
-          <div className={`order-setup-modal${orderSetupStep > 1 ? ' with-back' : ''}`}>
-            <button
-              type="button"
-              className="modal-close-button"
-              onClick={() => setShowOrderSetup(false)}
-              aria-label="Close order setup"
-            >
-              X
-            </button>
-
-            {orderSetupStep > 1 && (
+      <section className="sticky-order-filters" aria-label="Order filters">
+        <div className="container sticky-order-filters-inner" ref={orderFilterRef}>
+          <div className="order-filter-field">
+            <label id="order-filter-outlet-label">Outlet</label>
+            <div className={openFilterDropdown === 'outlet' ? 'order-filter-dropdown is-open' : 'order-filter-dropdown'}>
               <button
                 type="button"
-                className="modal-back-button"
-                onClick={() => setOrderSetupStep(orderSetupStep - 1)}
-                aria-label="Back"
+                className="order-filter-trigger"
+                aria-haspopup="listbox"
+                aria-expanded={openFilterDropdown === 'outlet'}
+                aria-labelledby="order-filter-outlet-label"
+                onClick={() => toggleFilterDropdown('outlet')}
               >
-                Back
+                <span className="order-filter-trigger-text">{selectedOutlet || 'Choose outlet'}</span>
+                <span className="order-filter-chevron" aria-hidden="true">⌄</span>
               </button>
-            )}
 
-            <div className="order-step-indicator" aria-hidden="true">
-              <span className={orderSetupStep >= 1 ? 'step-dot active' : 'step-dot'}></span>
-              <span className={orderSetupStep >= 2 ? 'step-dot active' : 'step-dot'}></span>
-              <span className={orderSetupStep >= 3 ? 'step-dot active' : 'step-dot'}></span>
-            </div>
-
-            {orderSetupStep === 1 && (
-              <div className="order-frame">
-                <h2 id="order-setup-title">Choose outlet</h2>
-                <div className="order-step">
-                  <div className="outlet-options">
-                    {outletOptions.map((outlet) => (
+              {openFilterDropdown === 'outlet' && (
+                <ul className="order-filter-menu" role="listbox" aria-labelledby="order-filter-outlet-label">
+                  {outletOptions.map((outlet) => (
+                    <li key={`sticky-${outlet}`}>
                       <button
-                        key={outlet}
                         type="button"
-                        className={selectedOutlet === outlet ? 'outlet-button active' : 'outlet-button'}
-                        onClick={() => setSelectedOutlet(outlet)}
+                        className={selectedOutlet === outlet ? 'order-filter-option active' : 'order-filter-option'}
+                        onClick={() => handleOutletFilterChange(outlet)}
                       >
                         {outlet}
                       </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="confirm-order-setup"
-                  onClick={goToDateStep}
-                  disabled={!selectedOutlet}
-                >
-                  Next
-                </button>
-              </div>
-            )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
 
-            {orderSetupStep === 2 && (
-              <div className="order-frame">
-                <h2 id="order-setup-title">Choose date</h2>
-                {isRestrictedOutlet && (
-                  <p className="outlet-restriction-note">
-                    For the selected outlets, only same-day delivery or self collect is available.
-                  </p>
-                )}
-                <div className="order-step">
-                  <div className={isRestrictedOutlet ? 'date-options restricted' : 'date-options'}>
-                    {visibleDateOptions.map((dateOption) => (
+          <div className="order-filter-field">
+            <label id="order-filter-date-label">Date</label>
+            <div className={openFilterDropdown === 'date' ? 'order-filter-dropdown is-open' : 'order-filter-dropdown'}>
+              <button
+                type="button"
+                className="order-filter-trigger"
+                aria-haspopup="listbox"
+                aria-expanded={openFilterDropdown === 'date'}
+                aria-labelledby="order-filter-date-label"
+                onClick={() => toggleFilterDropdown('date')}
+                disabled={!selectedOutlet}
+              >
+                <span className="order-filter-trigger-text">{selectedDateLabel}</span>
+                <span className="order-filter-chevron" aria-hidden="true">⌄</span>
+              </button>
+
+              {openFilterDropdown === 'date' && selectedOutlet && (
+                <ul className="order-filter-menu" role="listbox" aria-labelledby="order-filter-date-label">
+                  {visibleDateOptions.map((dateOption) => (
+                    <li key={`sticky-${dateOption.value}`}>
                       <button
-                        key={dateOption.value}
                         type="button"
-                        className={selectedDate === dateOption.value ? 'date-option-button active' : 'date-option-button'}
-                        onClick={() => setSelectedDate(dateOption.value)}
+                        className={selectedDate === dateOption.value ? 'order-filter-option active' : 'order-filter-option'}
+                        onClick={() => handleDateFilterChange(dateOption.value)}
                       >
                         {dateOption.label}
                       </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="confirm-order-setup"
-                  onClick={goToOrderMethodStep}
-                  disabled={!selectedDate}
-                >
-                  Next
-                </button>
-              </div>
-            )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
 
-            {orderSetupStep === 3 && (
-              <div className="order-frame">
-                <h2 id="order-setup-title">Choose order method</h2>
-                <div className="order-step">
-                  <div className="order-type-options">
+          <div className="order-filter-field">
+            <label id="order-filter-method-label">Order Method</label>
+            <div className={openFilterDropdown === 'method' ? 'order-filter-dropdown is-open' : 'order-filter-dropdown'}>
+              <button
+                type="button"
+                className="order-filter-trigger"
+                aria-haspopup="listbox"
+                aria-expanded={openFilterDropdown === 'method'}
+                aria-labelledby="order-filter-method-label"
+                onClick={() => toggleFilterDropdown('method')}
+                disabled={!selectedOutlet || !selectedDate}
+              >
+                <span className="order-filter-trigger-text">{orderType || 'Choose method'}</span>
+                <span className="order-filter-chevron" aria-hidden="true">⌄</span>
+              </button>
+
+              {openFilterDropdown === 'method' && selectedOutlet && selectedDate && (
+                <ul className="order-filter-menu" role="listbox" aria-labelledby="order-filter-method-label">
+                  <li>
                     <button
                       type="button"
-                      className={orderType === 'Delivery' ? 'option-button active' : 'option-button'}
-                      onClick={() => chooseOrderType('Delivery')}
+                      className={orderType === 'Delivery' ? 'order-filter-option active' : 'order-filter-option'}
+                      onClick={() => handleOrderTypeFilterChange('Delivery')}
                       disabled={isRestrictedOutlet}
                     >
                       Delivery
                     </button>
+                  </li>
+                  <li>
                     <button
                       type="button"
-                      className={orderType === 'Self Collect' ? 'option-button active' : 'option-button'}
-                      onClick={() => chooseOrderType('Self Collect')}
+                      className={orderType === 'Self Collect' ? 'order-filter-option active' : 'order-filter-option'}
+                      onClick={() => handleOrderTypeFilterChange('Self Collect')}
                     >
                       Self Collect
                     </button>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="confirm-order-setup"
-                  onClick={saveDummyOrderSelection}
-                  disabled={!orderType}
-                >
-                  Confirm options
-                </button>
-              </div>
-            )}
+                  </li>
+                </ul>
+              )}
+            </div>
           </div>
         </div>
-      )}
+      </section>
 
       <section className="carousel-section container" aria-label="Promotional banners">
         <div
@@ -898,9 +976,22 @@ export default function App() {
 
       <footer className="site-footer container">
         <div className="footer-content" id="contact">
-          <div className="map-placeholder">
-            Map Image Placeholder
-          </div>
+          <a
+            className="map-link-card"
+            href="https://maps.app.goo.gl/bPjK4z7ARuuCEjg18"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Labu+labu location in Google Maps"
+          >
+            <div className="map-frame-wrap">
+              <iframe
+                title="Labu+labu location map"
+                src="https://www.google.com/maps?q=Labu+labu+Bakery+Cafe+Kuala+Lumpur&output=embed"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </a>
           <div className="footer-contacts">
             <h2>contacts</h2>
             <p>
@@ -915,10 +1006,10 @@ export default function App() {
             </p>
             <div className="footer-social">
               <a href="https://www.facebook.com/labulabubakery" target="_blank" rel="noreferrer" style={{ marginRight: '10px' }}>
-                <img src="/fblogo.png" alt="Facebook" className="social-logo" />
+                <img src="/labufb.png" alt="Facebook" className="social-logo" />
               </a>
               <a href="https://www.instagram.com/labulabubakery" target="_blank" rel="noreferrer">
-                <img src="/instalogo.png" alt="Instagram" className="social-logo" />
+                <img src="/labuinsta.png" alt="Instagram" className="social-logo" />
               </a>
             </div>
             <p className="phone">013-902 0018</p>
@@ -1188,7 +1279,7 @@ export default function App() {
                   className={activeCategory === category ? 'category-drawer-item active' : 'category-drawer-item'}
                   onClick={() => chooseCategoryFromDrawer(category)}
                 >
-                  <span>{category === 'BALL' ? 'BALLS' : category}</span>
+                  <span>{formatCategoryLabel(category)}</span>
                   <span className="category-drawer-chevron" aria-hidden="true">›</span>
                 </button>
               </li>
