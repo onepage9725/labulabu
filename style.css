@@ -116,6 +116,7 @@ a {
     display: grid;
     gap: 5px;
     position: relative;
+    min-width: 0;
 }
 
 .order-filter-field label {
@@ -145,6 +146,8 @@ a {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    min-width: 0;
+    overflow: hidden;
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -164,6 +167,8 @@ a {
 }
 
 .order-filter-trigger-text {
+    flex: 1 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2033,19 +2038,31 @@ a {
         top: calc(var(--banner-height) + var(--navbar-height));
     }
     .sticky-order-filters-inner {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.95fr) minmax(0, 1fr);
         gap: 8px;
         padding-top: 10px;
         padding-bottom: 10px;
     }
+    .sticky-order-filters-inner .order-filter-field:last-child {
+        grid-column: auto;
+    }
     .order-filter-field label {
-        font-size: 10px;
+        font-size: 9px;
+        letter-spacing: 0.02em;
     }
     .order-filter-trigger {
-        min-height: 38px;
+        min-height: 34px;
+        font-size: 11px;
+        padding: 7px 8px;
+    }
+    .order-filter-chevron {
         font-size: 12px;
-        padding: 8px 9px;
     }
     .order-filter-menu {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        min-width: min(86vw, 320px);
         max-height: min(260px, 48vh);
     }
     .carousel-section {
@@ -2079,12 +2096,21 @@ a {
 
 @media (max-width: 480px) {
     .sticky-order-filters-inner {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.95fr) minmax(0, 1fr);
+        gap: 6px;
+        padding-top: 8px;
+        padding-bottom: 8px;
     }
-    .sticky-order-filters-inner .order-filter-field:last-child {
-        grid-column: auto;
+    .order-filter-field label {
+        font-size: 8px;
+    }
+    .order-filter-trigger {
+        min-height: 32px;
+        font-size: 10px;
+        padding: 6px 7px;
     }
     .order-filter-menu {
+        min-width: min(90vw, 300px);
         max-height: min(220px, 44vh);
     }
     .navbar {

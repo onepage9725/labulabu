@@ -481,6 +481,9 @@ export default function App() {
   };
 
   const selectedDateLabel = dateOptions.find((option) => option.value === selectedDate)?.label || 'Choose date';
+  const selectedOutletLabel = selectedOutlet
+    ? selectedOutlet.split(' - ')[0]
+    : 'Choose outlet';
 
   const syncOrderSelection = (nextOrderType, nextOutlet, nextDate) => {
     if (nextOrderType && nextOutlet && nextDate) {
@@ -665,7 +668,7 @@ export default function App() {
                 aria-labelledby="order-filter-outlet-label"
                 onClick={() => toggleFilterDropdown('outlet')}
               >
-                <span className="order-filter-trigger-text">{selectedOutlet || 'Choose outlet'}</span>
+                <span className="order-filter-trigger-text">{selectedOutletLabel}</span>
                 <span className="order-filter-chevron" aria-hidden="true">⌄</span>
               </button>
 
