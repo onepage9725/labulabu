@@ -11,6 +11,30 @@ const SPECIAL_PACK_PRODUCTS = new Set([
   'SPICY SEAWEED CHICKEN FLOSSIE BALLS'
 ]);
 
+const OUTLET_LOCATION_DETAILS = {
+  'Taman Indah Cheras - Cafe': {
+    mapUrl: 'https://maps.app.goo.gl/Q3kKphdhoNZ6MK2u7',
+    addressLines: [
+      '26, Jalan Indah 23, Taman Cheras Indah,',
+      '55300 Kuala Lumpur, Selangor'
+    ]
+  },
+  'Sunway Mentari - Bakery': {
+    mapUrl: 'https://maps.app.goo.gl/W1GUfsFynjnQi3rY8',
+    addressLines: [
+      '22, Jalan PJS 8/4, Sunway Mentari,',
+      '46150 Petaling Jaya, Selangor'
+    ]
+  },
+  'Nusa Sentral - Bakery': {
+    mapUrl: 'https://maps.app.goo.gl/ARbW21xjAWLpQbz59',
+    addressLines: [
+      '69, Jln Sentral 24, Taman Nusa Sentral,',
+      '79100 Iskandar Puteri, Johor'
+    ]
+  }
+};
+
 const PRODUCT_PRICE = 20;
 
 export default function App() {
@@ -484,6 +508,9 @@ export default function App() {
   const selectedOutletLabel = selectedOutlet
     ? selectedOutlet.split(' - ')[0]
     : 'Choose outlet';
+  const activeOutletLocation = OUTLET_LOCATION_DETAILS[selectedOutlet] || OUTLET_LOCATION_DETAILS['Taman Indah Cheras - Cafe'];
+  const activeOutletAddress = activeOutletLocation.addressLines.join(' ');
+  const activeOutletEmbedSrc = `https://www.google.com/maps?q=${encodeURIComponent(activeOutletAddress)}&output=embed`;
 
   const syncOrderSelection = (nextOrderType, nextOutlet, nextDate) => {
     if (nextOrderType && nextOutlet && nextDate) {
@@ -981,7 +1008,7 @@ export default function App() {
         <div className="footer-content" id="contact">
           <a
             className="map-link-card"
-            href="https://maps.app.goo.gl/bPjK4z7ARuuCEjg18"
+            href={activeOutletLocation.mapUrl}
             target="_blank"
             rel="noreferrer"
             aria-label="Open Labu+labu location in Google Maps"
@@ -989,7 +1016,7 @@ export default function App() {
             <div className="map-frame-wrap">
               <iframe
                 title="Labu+labu location map"
-                src="https://www.google.com/maps?q=Labu+labu+Bakery+Cafe+Kuala+Lumpur&output=embed"
+                src={activeOutletEmbedSrc}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
@@ -1004,8 +1031,8 @@ export default function App() {
               Monday & Tuesday: Closed
             </p>
             <p>
-              26, Jalan Indah 23, Taman Cheras Indah,<br />
-              55300 Kuala Lumpur, Selangor
+              {activeOutletLocation.addressLines[0]}<br />
+              {activeOutletLocation.addressLines[1]}
             </p>
             <div className="footer-social">
               <a href="https://www.facebook.com/labulabubakery" target="_blank" rel="noreferrer" style={{ marginRight: '10px' }}>
