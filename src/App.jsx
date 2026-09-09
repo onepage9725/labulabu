@@ -65,6 +65,9 @@ export default function App() {
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
   const [isAccountPromptOpen, setIsAccountPromptOpen] = useState(false);
   const [openFilterDropdown, setOpenFilterDropdown] = useState('');
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
+  );
   const addFeedbackTimeoutRef = useRef(null);
   const cartPulseTimeoutRef = useRef(null);
 
@@ -371,6 +374,33 @@ export default function App() {
     if (cartPulseTimeoutRef.current) {
       clearTimeout(cartPulseTimeoutRef.current);
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleViewportChange = () => {
+      setIsMobileViewport(mediaQuery.matches);
+    };
+
+    handleViewportChange();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleViewportChange);
+
+      return () => {
+        mediaQuery.removeEventListener('change', handleViewportChange);
+      };
+    }
+
+    mediaQuery.addListener(handleViewportChange);
+
+    return () => {
+      mediaQuery.removeListener(handleViewportChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -819,11 +849,11 @@ export default function App() {
                 onClick={() => setExpandedBannerIndex(index)}
                 aria-label={`View banner: ${slide.title}`}
               >
-                <picture>
-                  <source media="(max-width: 768px)" srcSet={slide.mobileImg} />
-                  <img src={slide.desktopImg} alt={slide.title} className="banner-slide-image" />
-                </picture>
-                <span className="banner-slide-title">{slide.title}</span>
+                <img
+                  src={isMobileViewport ? slide.mobileImg : slide.desktopImg}
+                  alt={slide.title}
+                  className="banner-slide-image"
+                />
               </button>
             ))}
           </div>
@@ -1310,14 +1340,11 @@ export default function App() {
             <button type="button" className="banner-modal-close" onClick={() => setExpandedBannerIndex(null)} aria-label="Close banner preview">
               Close
             </button>
-            <picture>
-              <source media="(max-width: 768px)" srcSet={bannerSlides[expandedBannerIndex].mobileImg} />
-              <img
-                src={bannerSlides[expandedBannerIndex].desktopImg}
-                alt={bannerSlides[expandedBannerIndex].title}
-                className="banner-modal-image"
-              />
-            </picture>
+            <img
+              src={isMobileViewport ? bannerSlides[expandedBannerIndex].mobileImg : bannerSlides[expandedBannerIndex].desktopImg}
+              alt={bannerSlides[expandedBannerIndex].title}
+              className="banner-modal-image"
+            />
           </div>
         </div>
       )}
