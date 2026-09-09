@@ -47,7 +47,6 @@ a {
 /* Typography styles matching the design */
 .category, .badge, .filter-list a, .menu-link, .top-banner, .price {
     font-family: var(--font-heading);
-    text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
@@ -123,7 +122,6 @@ a {
     font-family: var(--font-heading);
     font-size: 11px;
     letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: var(--secondary-color);
     opacity: 0.95;
 }
@@ -285,7 +283,6 @@ a {
     font-size: 11px;
     padding: 8px 10px;
     cursor: pointer;
-    text-transform: uppercase;
 }
 
 .nav-order-toggle-btn.active {
@@ -331,7 +328,6 @@ a {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.03em;
-    text-transform: uppercase;
     padding: 8px 12px;
     min-height: 34px;
     cursor: pointer;
@@ -476,7 +472,6 @@ a {
     font-family: var(--font-heading);
     font-size: 11px;
     letter-spacing: 0.03em;
-    text-transform: uppercase;
     padding: 8px 12px;
     cursor: pointer;
     white-space: nowrap;
@@ -540,7 +535,6 @@ a {
     font-size: 13px;
     color: var(--secondary-color);
     letter-spacing: 0.04em;
-    text-transform: uppercase;
 }
 
 .order-step-indicator {
@@ -793,7 +787,6 @@ a {
     border-radius: 4px;
     font-size: 11px;
     font-family: var(--font-heading);
-    text-transform: uppercase;
 }
 
 /* Hero Section */
@@ -1091,7 +1084,6 @@ a {
     border-radius: 999px;
     padding: 4px 10px;
     font-family: var(--font-heading);
-    text-transform: uppercase;
     letter-spacing: 0.03em;
     font-size: 10px;
     line-height: 1.1;
@@ -1190,7 +1182,6 @@ a {
     padding: 10px 12px;
     font-family: var(--font-heading);
     letter-spacing: 0.03em;
-    text-transform: uppercase;
     font-size: 12px;
     cursor: pointer;
 }
@@ -1269,7 +1260,6 @@ a {
     font-family: var(--font-heading);
     font-size: 12px;
     letter-spacing: 0.03em;
-    text-transform: uppercase;
 }
 
 .account-login-form input {
@@ -1294,7 +1284,6 @@ a {
     border-radius: 10px;
     padding: 11px 12px;
     font-family: var(--font-heading);
-    text-transform: uppercase;
     font-size: 12px;
     cursor: pointer;
 }
@@ -1318,7 +1307,6 @@ a {
     color: var(--secondary-color);
     font-family: var(--font-heading);
     font-size: 12px;
-    text-transform: uppercase;
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
@@ -1632,7 +1620,6 @@ a {
 .checkout-form label {
     font-size: 12px;
     font-family: var(--font-heading);
-    text-transform: uppercase;
 }
 
 .checkout-form input,
@@ -1817,7 +1804,6 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    text-transform: uppercase;
     letter-spacing: 0.03em;
     font-size: 12px;
     padding: 4px 0;
@@ -1930,7 +1916,6 @@ a {
     font-family: var(--font-heading);
     font-size: 12px;
     letter-spacing: 0.04em;
-    text-transform: uppercase;
 }
 
 .third-party-icon {
@@ -1989,10 +1974,10 @@ a {
     }
     .navbar {
         padding: 14px 16px;
-        border-radius: 20px;
-        margin: 10px 12px 0;
-        border: 1px solid rgba(104, 52, 16, 0.12);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+        border-radius: 0;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
         justify-content: center;
         min-height: 88px;
         top: var(--banner-height);
@@ -2122,9 +2107,8 @@ a {
     }
     .navbar {
         min-height: 76px;
-        border-radius: 16px;
         padding: 10px 12px;
-        margin: 8px 8px 0;
+        margin: 0;
     }
     .nav-center .logo {
         height: 20px;

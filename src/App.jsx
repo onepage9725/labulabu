@@ -635,7 +635,7 @@ export default function App() {
   return (
     <>
       <div className="top-banner">
-        <span style={{ color: 'var(--secondary-color)' }}>ORDER FRESH BAKE HERE</span>
+        <span style={{ color: 'var(--secondary-color)' }}>Order fresh bake here</span>
       </div>
 
       <header className="navbar" ref={navbarRef}>
@@ -838,25 +838,6 @@ export default function App() {
       </section>
 
       <main className="main-content container">
-        <section className="top-category-bar" aria-label="Product categories">
-          <ul className="filter-list top-filter-list">
-              {categoryOptions.map((category) => (
-                <li key={category}>
-                  <a
-                    href="#"
-                    className={activeCategory === category ? 'active' : ''}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setActiveCategory(category);
-                    }}
-                  >
-                    {category === 'BALL' ? 'BALLS' : category}
-                  </a>
-                </li>
-              ))}
-          </ul>
-        </section>
-
         <div className="product-grid">
           {filteredProducts.map((product, index) => (
             <FadeUpGridCard key={product.id} index={index}>
