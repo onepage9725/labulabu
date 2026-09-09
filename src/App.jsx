@@ -964,10 +964,10 @@ export default function App() {
       <section className="faq-section container" aria-labelledby="faq-title">
         <h2 id="faq-title">FAQ</h2>
         <div className="faq-grid faq-category-grid">
-          <details className="faq-category" open>
+          <details className="faq-category">
             <summary>About Product</summary>
             <div className="faq-category-content">
-              <details className="faq-item" open>
+              <details className="faq-item">
                 <summary>How early should I place my order?</summary>
                 <p>Please place your order at least 1 day in advance for best availability.</p>
               </details>
@@ -985,7 +985,7 @@ export default function App() {
           <details className="faq-category">
             <summary>About Delivery</summary>
             <div className="faq-category-content">
-              <details className="faq-item" open>
+              <details className="faq-item">
                 <summary>How much is delivery fee?</summary>
                 <p>Delivery orders include a flat RM 20 delivery fee.</p>
               </details>
@@ -1003,7 +1003,7 @@ export default function App() {
           <details className="faq-category">
             <summary>About Self Collect</summary>
             <div className="faq-category-content">
-              <details className="faq-item" open>
+              <details className="faq-item">
                 <summary>How do I choose a pickup time?</summary>
                 <p>Choose your outlet and date first, then our team will confirm the pickup timing.</p>
               </details>
