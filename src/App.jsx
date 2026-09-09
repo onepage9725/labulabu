@@ -164,9 +164,18 @@ export default function App() {
   ];
 
   const bannerSlides = [
-    { id: 'banner-1', title: 'Freshly Baked Daily', img: '/backery/Chicken Flossie Balls.png' },
-    { id: 'banner-2', title: 'Handcrafted Cakes', img: '/backery/Black Forest Cake.png' },
-    { id: 'banner-3', title: 'Seasonal Signatures', img: '/backery/Slice Yam Burnt Cheesecake.png' }
+    {
+      id: 'banner-1',
+      title: 'Freshly Baked Daily',
+      desktopImg: '/labu banner 1.png',
+      mobileImg: '/labu mobile banner1.png'
+    },
+    {
+      id: 'banner-2',
+      title: 'Handcrafted Cakes',
+      desktopImg: '/labu banner 2.png',
+      mobileImg: '/labu mobile banner1 (2).png'
+    }
   ];
 
   const filteredProducts = activeCategory === 'ALL' 
@@ -810,7 +819,10 @@ export default function App() {
                 onClick={() => setExpandedBannerIndex(index)}
                 aria-label={`View banner: ${slide.title}`}
               >
-                <img src={slide.img} alt={slide.title} className="banner-slide-image" />
+                <picture>
+                  <source media="(max-width: 768px)" srcSet={slide.mobileImg} />
+                  <img src={slide.desktopImg} alt={slide.title} className="banner-slide-image" />
+                </picture>
                 <span className="banner-slide-title">{slide.title}</span>
               </button>
             ))}
@@ -1298,11 +1310,14 @@ export default function App() {
             <button type="button" className="banner-modal-close" onClick={() => setExpandedBannerIndex(null)} aria-label="Close banner preview">
               Close
             </button>
-            <img
-              src={bannerSlides[expandedBannerIndex].img}
-              alt={bannerSlides[expandedBannerIndex].title}
-              className="banner-modal-image"
-            />
+            <picture>
+              <source media="(max-width: 768px)" srcSet={bannerSlides[expandedBannerIndex].mobileImg} />
+              <img
+                src={bannerSlides[expandedBannerIndex].desktopImg}
+                alt={bannerSlides[expandedBannerIndex].title}
+                className="banner-modal-image"
+              />
+            </picture>
           </div>
         </div>
       )}
