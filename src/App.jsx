@@ -795,7 +795,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="carousel-section container" aria-label="Promotional banners">
+      <section className="carousel-section" aria-label="Promotional banners">
         <div
           className="banner-carousel"
           onTouchStart={handleCarouselTouchStart}
@@ -815,13 +815,6 @@ export default function App() {
               </button>
             ))}
           </div>
-
-          <button type="button" className="banner-nav banner-nav-prev" onClick={goToPreviousBanner} aria-label="Previous banner">
-            ‹
-          </button>
-          <button type="button" className="banner-nav banner-nav-next" onClick={goToNextBanner} aria-label="Next banner">
-            ›
-          </button>
 
           <div className="banner-dots" role="tablist" aria-label="Banner selector">
             {bannerSlides.map((slide, index) => (

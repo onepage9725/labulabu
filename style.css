@@ -335,8 +335,8 @@ a {
 }
 
 .mobile-account-icon-button {
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
+    border: none;
+    border-radius: 0;
     background: transparent;
 }
 
@@ -362,8 +362,8 @@ a {
 }
 
 .mobile-smile-button {
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
+    border: none;
+    border-radius: 0;
     background: transparent;
 }
 
@@ -401,11 +401,11 @@ a {
 }
 
 .nav-icon-button {
-    border: 1px solid var(--border-color);
+    border: none;
     background: transparent;
     width: 42px;
     height: 42px;
-    border-radius: 999px;
+    border-radius: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -413,7 +413,7 @@ a {
 }
 
 .nav-icon-button:hover {
-    border-color: var(--primary-color);
+    opacity: 0.8;
 }
 
 .nav-icon-button:disabled,
@@ -798,9 +798,9 @@ a {
 .banner-carousel {
     position: relative;
     overflow: hidden;
-    border-radius: 16px;
-    border: 1px solid rgba(104, 52, 16, 0.2);
-    background: linear-gradient(180deg, #f7f4ea 0%, #ece5d6 100%);
+    border-radius: 0;
+    border: none;
+    background: transparent;
     height: 260px;
 }
 
@@ -836,30 +836,6 @@ a {
     color: #fff;
     text-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     letter-spacing: 0.02em;
-}
-
-.banner-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 42px;
-    height: 42px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    background: rgba(31, 19, 6, 0.36);
-    color: #fff;
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 2;
-}
-
-.banner-nav-prev {
-    left: 12px;
-}
-
-.banner-nav-next {
-    right: 12px;
 }
 
 .banner-dots {
@@ -1676,12 +1652,12 @@ a {
 }
 
 .faq-section {
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 18px;
+    border: none;
+    border-radius: 0;
+    padding: 0;
     margin-top: 40px;
     margin-bottom: 40px;
-    background: rgba(255, 255, 255, 0.55);
+    background: transparent;
 }
 
 .faq-section h2 {
@@ -1699,10 +1675,10 @@ a {
 }
 
 .faq-category {
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    background: #fff;
-    padding: 10px 12px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 8px 0;
 }
 
 .faq-category > summary {
@@ -1733,10 +1709,10 @@ a {
 }
 
 .faq-item {
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: #fff;
+    border: none;
+    border-radius: 0;
+    padding: 8px 0;
+    background: transparent;
 }
 
 .faq-item summary {
@@ -1856,30 +1832,28 @@ a {
 .map-link-card {
     width: 100%;
     min-height: 400px;
-    background: linear-gradient(180deg, rgba(104, 52, 16, 0.08) 0%, rgba(104, 52, 16, 0.16) 100%);
+    background: transparent;
     display: flex;
     flex-direction: column;
-    border-radius: 8px;
-    border: 1px solid rgba(104, 52, 16, 0.2);
-    padding: 12px;
+    border-radius: 0;
+    border: none;
+    padding: 0;
     gap: 0;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: opacity 0.2s ease;
 }
 
 .map-link-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 22px rgba(30, 12, 2, 0.16);
-    border-color: rgba(104, 52, 16, 0.36);
+    opacity: 0.95;
 }
 
 .map-frame-wrap {
     width: 100%;
     flex: 1;
     min-height: 320px;
-    border-radius: 6px;
+    border-radius: 0;
     overflow: hidden;
-    border: 1px solid rgba(104, 52, 16, 0.18);
-    background: #efe7d7;
+    border: none;
+    background: transparent;
 }
 
 .map-frame-wrap iframe {
